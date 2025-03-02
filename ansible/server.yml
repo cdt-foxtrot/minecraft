@@ -1,0 +1,100 @@
+# Spencer Kurtz
+# sjk7876@rit.edu
+# Team Foxtrot - 2245
+
+# Downloads and sets up a Minecraft server instance
+- name: Download and set up a Minecraft server
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Java
+      apt:
+        name: openjdk-21-jdk
+        state: present
+    
+    - name: Install Screen
+      apt:
+        name: screen
+        state: present
+
+    # - name: minecraft user
+    #   user:
+    #     name: minecraft
+    #     shell: /sbin/nologin
+    
+    - name: Create Minecraft directory
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0750
+        owner: ansible
+        group: ansible
+      with_items:
+        - /opt/minecraft
+    
+    # - name: Download Minecraft server
+    #   get_url:
+    #     url: https://piston-data.mojang.com/v1/objects/4707d00eb834b446575d89a61a11b5d548d8c001/server.jar
+    #     dest: /opt/minecraft/server.jar
+    #     mode: 0700
+    #     owner: minecraft
+    #     group: minecraft
+
+    - name: Copy Minecraft server from local to remote machine
+      copy:
+        src: mc_files/server.jar
+        dest: /opt/minecraft/server.jar
+        mode: 0700
+        owner: ansible
+        group: ansible
+    
+    - name: Minecraft systemd service
+      copy:
+        src: mc_files/minecraft.service
+        dest: /etc/systemd/system/minecraft.service
+        mode: '0444'
+        owner: root
+        group: root
+
+    - name: Move server.properties from local to remote machine
+      copy:
+        src: mc_files/server.properties
+        dest: /opt/minecraft/server.properties
+        mode: 0600
+        owner: ansible
+        group: ansible
+
+    - name: Move eula.txt from local to remote machine
+      copy:
+        src: mc_files/eula.txt
+        dest: /opt/minecraft/eula.txt
+        mode: 0600
+        owner: ansible
+        group: ansible
+    
+    # Uncomment this block if you want to move a world from your local machine to the remote machine
+    # Inject :)
+    # - name: Move world from local to remote machine
+    #   copy:
+    #     src: mc_files/world
+    #     dest: /opt/minecraft/server/world
+    #     mode: 0700
+    #     owner: minecraft
+    #     group: minecraft
+
+    - name: Enable and start Minecraft server
+      systemd:
+        name: minecraft
+        state: started
+        enabled: yes
+        daemon_reload: yes
+      register: minecraft_service
+
+    # - name: Start Minecraft server
+    #   command: java -Xmx1024M -Xms2048M -jar /opt/minecraft/server.jar nogui
+    #   args:
+    #     chdir: /opt/minecraft
+    #     creates: /opt/minecraft/eula.txt
+    #     removes: /opt/minecraft/eula.txt
+    #   async: 0
+    #   poll: 0
