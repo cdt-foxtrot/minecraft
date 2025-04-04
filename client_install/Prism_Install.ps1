@@ -8,7 +8,7 @@ $ServerDir = "$env:USERPROFILE\MinecraftServer"
 $ServerJar = "$ServerDir\server.jar"
 $EULAFile = "$ServerDir\eula.txt"
 $PrismAppDataDir = "$env:APPDATA\PrismLauncher"
-$PrismInstallDir = "C:\Users\Student\AppData\Local\Programs\PrismLauncher"  # Correct installation directory
+$PrismInstallDir = "C:\Users\cyberrange\AppData\Local\Programs\PrismLauncher"  # Correct installation directory
 
 # Function to check if Java is installed
 function Check-Java {
