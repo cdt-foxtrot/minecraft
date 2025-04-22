@@ -1,0 +1,28 @@
+[Unit]
+Description=Minecraft Server
+After=network.target
+
+[Service]
+User=lane2
+WorkingDirectory=/home/lane2/mc1
+
+ExecStart=/usr/bin/screen -DmS beach /usr/bin/java -server -Xms1024M -Xmx1536M -jar paper-1.12.2-1620.jar nogui
+
+ExecReload=/bin/bash -c '/usr/bin/screen -S beach -p 0 -X stuff "say SERVER RELOADING. Saving map...\r"; \
+                         sleep 2; \
+                         /usr/bin/screen -S beach -p 0 -X stuff "save-all\r"; \
+                         /usr/bin/screen -S beach -p 0 -X stuff "stop\r"; \
+                         sleep 5; \
+                         /usr/bin/screen -DmS beach /usr/bin/java -server -Xms1024M -Xmx1536M -jar paper-1.12.2-1620.jar nogui'
+
+ExecStop=/bin/bash -c '/usr/bin/screen -S beach -p 0 -X stuff "say SERVER SHUTTING DOWN. Saving map...\r"; \
+                       sleep 2; \
+                       /usr/bin/screen -S beach -p 0 -X stuff "save-all\r"; \
+                       /usr/bin/screen -S beach -p 0 -X stuff "stop\r"; \
+                       sleep 5'
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
